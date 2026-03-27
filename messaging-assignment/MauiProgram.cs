@@ -1,4 +1,7 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using messaging_assignment.DAL;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 
 namespace messaging_assignment
 {
@@ -18,6 +21,11 @@ namespace messaging_assignment
 #if DEBUG
     		builder.Logging.AddDebug();
 #endif
+
+            builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
+
+            var conn = builder.Configuration.GetConnectionString("Default");
+            builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer(conn));
 
             return builder.Build();
         }

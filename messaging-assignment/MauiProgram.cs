@@ -1,5 +1,6 @@
-﻿using messaging_assignment.DAL;
-using Microsoft.EntityFrameworkCore;
+﻿using messaging_assignment.Pages;
+using messaging_assignment.Services;
+using messaging_assignment.ViewModels;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore;
@@ -33,6 +34,13 @@ namespace messaging_assignment
             builder.Services.AddSingleton<UserService>();
             builder.Services.AddSingleton<AuthService>();
             builder.Services.AddSingleton<MessageService>();
+
+            builder.Services.AddSingleton<LoginPage>();
+            builder.Services.AddSingleton<LoginViewModel>();
+            builder.Services.AddSingleton<RegisterPage>();
+            builder.Services.AddSingleton<RegisterViewModel>();
+            builder.Services.AddSingleton<UsersPage>();
+            builder.Services.AddSingleton<UsersViewModel>();
             return builder.Build();
         }
     }

@@ -186,6 +186,12 @@
         <Setter Property="HorizontalTextAlignment" Value="Center" />
     </Style>
 
+    <Style TargetType="Label" x:Key="LoginErrorMessage">
+        <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource NegativeTertiary}, Dark={StaticResource NegativeTertiary}}" />
+        <Setter Property="FontSize" Value="24" />
+        <Setter Property="HorizontalOptions" Value="Center" />
+        <Setter Property="HorizontalTextAlignment" Value="Center" />
+    </Style>
     <Style TargetType="Picker">
         <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource White}}" />
         <Setter Property="TitleColor" Value="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource Gray200}}" />

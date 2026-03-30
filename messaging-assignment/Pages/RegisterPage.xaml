@@ -5,5 +5,39 @@
              xmlns:viewmodels="clr-namespace:messaging_assignment.ViewModels"
              x:DataType="viewmodels:RegisterViewModel"
              >
-    
+    <VerticalStackLayout
+        VerticalOptions="Center"
+        Padding="30,0"
+        Spacing="5">
+
+
+        <Label Text="Username:" />
+        <Entry Text="{Binding Username}" />
+        <Label Text="{Binding UsernameError}"
+           TextColor="{StaticResource NegativeTertiary}"
+           FontSize="Caption"
+           IsVisible="{Binding HasUsernameError}" />
+
+        <Label Text="Full Name:" />
+        <Entry Text="{Binding FullName}" />
+        <Label Text="{Binding FullNameError}"
+            TextColor="{StaticResource NegativeTertiary}"
+            FontSize="Caption"
+            IsVisible="{Binding HasFullNameError}" />
+        
+        <Label Text="Password:" />
+        <Entry Text="{Binding Password}"  IsPassword="True" />
+        <Label Text="{Binding PasswordError}"
+            TextColor="{StaticResource NegativeTertiary}"
+            FontSize="Caption"
+            IsVisible="{Binding HasPasswordError}" />
+
+        <Button
+        x:Name="RegisterBtn"
+        Text="Register" 
+        SemanticProperties.Hint="Navigates to the registration page"
+        Command="{Binding RegisterCommand}"
+        HorizontalOptions="Fill" />
+
+    </VerticalStackLayout>
 </ContentPage>

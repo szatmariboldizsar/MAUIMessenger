@@ -115,6 +115,7 @@ namespace messaging_assignment.ViewModels
             ResortUserCategories();
         }
 
+        public void ResortUserCategories()
         {
             UsersWithLastMessage.Clear();
             FavoritedUsersWithLastMessage.Clear();

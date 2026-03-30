@@ -18,5 +18,8 @@ namespace DAL.Models
 
         [Required]
         public string FullName { get; set; }
+
+        [Required]
+        public bool IsHidden { get; set; }
     }
 }

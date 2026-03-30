@@ -22,8 +22,18 @@ namespace messaging_assignment
                     fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
                 });
 
+#if WINDOWS
+            Microsoft.Maui.Handlers.SwitchHandler.Mapper.AppendToMapping("NoLabel", (handler, view) =>
+            {
+                handler.PlatformView.OnContent = null;
+                handler.PlatformView.OffContent = null;
+
+                handler.PlatformView.MinWidth = 0;
+            });
+#endif
+
 #if DEBUG
-    		builder.Logging.AddDebug();
+            builder.Logging.AddDebug();
 #endif
 
             builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
@@ -32,6 +42,7 @@ namespace messaging_assignment
             builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer(conn));
 
             builder.Services.AddSingleton<UserService>();
+            builder.Services.AddSingleton<UserConnectionService>();
             builder.Services.AddSingleton<AuthService>();
             builder.Services.AddSingleton<MessageService>();
 
@@ -39,8 +50,11 @@ namespace messaging_assignment
             builder.Services.AddSingleton<LoginViewModel>();
             builder.Services.AddSingleton<RegisterPage>();
             builder.Services.AddSingleton<RegisterViewModel>();
-            builder.Services.AddSingleton<UsersPage>();
-            builder.Services.AddSingleton<UsersViewModel>();
+            builder.Services.AddTransient<UsersPage>();
+            builder.Services.AddTransient<UsersViewModel>();
+            builder.Services.AddTransient<MessagePage>();
+            builder.Services.AddTransient<MessageViewModel>();
+
             return builder.Build();
         }
     }

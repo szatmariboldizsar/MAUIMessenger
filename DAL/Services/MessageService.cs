@@ -1,4 +1,5 @@
-﻿using DAL.Models;
+﻿using DAL.DTOs;
+using DAL.Models;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -9,24 +10,36 @@ namespace DAL.Services
     public class MessageService
     {
         private readonly AppDbContext _dbContext;
+        private readonly UserService _userService;
 
-        public MessageService(AppDbContext dbContext)
+        public MessageService(AppDbContext dbContext, UserService userService)
         {
             _dbContext = dbContext;
+            _userService = userService;
         }
 
         public async Task<List<Message>> GetMessagesForUsersAsync(long userId1, long userId2)
         {
-            //return await _dbContext.Messages.Where(m => m.FromUserId == userId1 ||
-            //                                            m.FromUserId == userId2 &&
-            //                                            m.ToUserId == userId1 ||
-            //                                            m.ToUserId == userId2).OrderBy(m => m.DateSent).ToListAsync();
+            return await _dbContext.Messages.Where(m => (m.FromUserId == userId1 && m.ToUserId == userId2) || (m.FromUserId == userId2 && m.ToUserId == userId1)).OrderBy(m => m.DateSent).ToListAsync();
+        }
 
-            return new List<Message> { new Message() { FromUserId = 123, Content = "Test message From" },
-                                        new Message() { Content = "Test message To" },
-                                        new Message() { FromUserId = 123, Content = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer pulvinar tellus quis purus volutpat, eu vehicula dui tempor. Nulla bibendum tincidunt molestie. Proin egestas tellus sagittis dolor vestibulum dapibus. Duis risus dui, congue et commodo eget, commodo in lorem. Fusce lacinia tempus dictum. Integer egestas rhoncus faucibus. Duis sit amet vulputate sem. Cras interdum leo vel nulla semper mattis. Pellentesque neque sem, finibus ac imperdiet vel, fermentum non augue. Vestibulum tempor nisl vel velit elementum suscipit. Aenean malesuada eu lectus rutrum dapibus. Nunc vel lacus enim. Aliquam interdum porttitor commodo." },
-                                        new Message() { Content = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer pulvinar tellus quis purus volutpat, eu vehicula dui tempor. Nulla bibendum tincidunt molestie. Proin egestas tellus sagittis dolor vestibulum dapibus. Duis risus dui, congue et commodo eget, commodo in lorem. Fusce lacinia tempus dictum. Integer egestas rhoncus faucibus. Duis sit amet vulputate sem. Cras interdum leo vel nulla semper mattis. Pellentesque neque sem, finibus ac imperdiet vel, fermentum non augue. Vestibulum tempor nisl vel velit elementum suscipit. Aenean malesuada eu lectus rutrum dapibus. Nunc vel lacus enim. Aliquam interdum porttitor commodo." }
-                                     };
+        public async Task<Message?> GetLastMessageForUsers(long userId1, long userId2)
+        {
+            return await _dbContext.Messages.OrderByDescending(m => m.DateSent).FirstOrDefaultAsync(m => (m.FromUserId == userId1 && m.ToUserId == userId2) || (m.FromUserId == userId2 && m.ToUserId == userId1));
+        }
+
+        public async Task<List<UserWithMessage>> GetLastMessagesForUser(long userId)
+        {
+            List<UserWithMessage> lastMessages = new List<UserWithMessage>();
+            List<User> users = await _userService.GetAllUsersForUserAsync(userId);
+
+            foreach (User user in users)
+            {
+                UserWithMessage userWithMessage = new UserWithMessage(user, await GetLastMessageForUsers(userId, user.Id));
+                lastMessages.Add(userWithMessage);
+            }
+
+            return lastMessages;
         }
     }
 }

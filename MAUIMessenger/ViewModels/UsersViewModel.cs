@@ -5,6 +5,7 @@ using DAL.Models;
 using DAL.Services;
 using MAUIMessenger.Pages;
 using MAUIMessenger.Services;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -58,13 +59,13 @@ namespace MAUIMessenger.ViewModels
         public bool BlockedVisible { get => BlockedUsers.Count > 0; }
 
         [ObservableProperty]
-        public partial ObservableCollection<UserWithMessage> UsersWithLastMessage { get; set; } = new ObservableCollection<UserWithMessage>();
+        public partial ObservableHashSet<UserWithMessage> UsersWithLastMessage { get; set; } = new ObservableHashSet<UserWithMessage>();
 
         [ObservableProperty]
-        public partial ObservableCollection<UserWithMessage> FavoritedUsersWithLastMessage { get; set; } = new ObservableCollection<UserWithMessage>();
-
+        public partial ObservableHashSet<UserWithMessage> FavoritedUsersWithLastMessage { get; set; } = new ObservableHashSet<UserWithMessage>();
+        
         [ObservableProperty]
-        public partial ObservableCollection<User> BlockedUsers { get; set; } = new ObservableCollection<User>();
+        public partial ObservableHashSet<User> BlockedUsers { get; set; } = new ObservableHashSet<User>();
 
         [ObservableProperty]
         public partial User? SelectedUser { get; set; }
@@ -156,6 +157,9 @@ namespace MAUIMessenger.ViewModels
                     UsersWithLastMessage.Add(userWithMessage);
                 }
             }
+            OnPropertyChanged(nameof(UsersWithLastMessage));
+            OnPropertyChanged(nameof(FavoritedUsersWithLastMessage));
+            OnPropertyChanged(nameof(BlockedUsers));
             OnPropertyChanged(nameof(NoUsersLabelVisible));
             OnPropertyChanged(nameof(FavoritesVisible));
             OnPropertyChanged(nameof(BlockedVisible));

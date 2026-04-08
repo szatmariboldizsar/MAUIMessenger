@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="MAUIMessenger.Pages.LoginPage"
+             xmlns:viewmodels="clr-namespace:MAUIMessenger.ViewModels"
+             x:DataType="viewmodels:LoginViewModel"
+             >
+    <VerticalStackLayout
+    VerticalOptions="Center"
+    Padding="30,0"
+    Spacing="5">
+
+        <Label
+        Text="Welcome!"
+        Style="{StaticResource Headline}"
+        SemanticProperties.HeadingLevel="Level1" Padding="5" />
+
+        <Label
+        Text="{Binding ErrorMessage}"
+        Style="{StaticResource LoginErrorMessage}"
+        SemanticProperties.HeadingLevel="Level1" Padding="5" />
+
+        <Label Text="Username:" />
+        <Entry Text="{Binding Username}" ReturnCommand="{Binding LoginCommand}"/>
+        <Label Text="Password:" />
+        <Entry Text="{Binding Password}"  IsPassword="True" ReturnCommand="{Binding LoginCommand}"/>
+
+        <Button
+            x:Name="LoginBtn"
+            Text="Log In" 
+            SemanticProperties.Hint="Tries to login with the entered credentials"
+            Command="{Binding LoginCommand}"
+            HorizontalOptions="Fill"
+            Margin="0,5"/>
+
+        <Label Text="Don't have an account yet?" HorizontalOptions="Center" Margin="0,20,0,0" />
+
+        <Button
+            x:Name="RegisterBtn"
+            Text="Register" 
+            SemanticProperties.Hint="Navigates to the registration page"
+            Command="{Binding RegisterCommand}"
+            HorizontalOptions="Fill" />
+
+    </VerticalStackLayout>
+</ContentPage>

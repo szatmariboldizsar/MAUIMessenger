@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="MAUIMessenger.Pages.UsersPage"
+             xmlns:viewmodels="clr-namespace:MAUIMessenger.ViewModels"
+             x:DataType="viewmodels:UsersViewModel"
+             xmlns:models="clr-namespace:DAL.Models;assembly=DAL"
+             xmlns:dtos="clr-namespace:DAL.DTOs;assembly=DAL"
+             NavigationPage.HasBackButton="False"
+             Shell.BackButtonBehavior="{BackButtonBehavior IsVisible=False}"
+             xmlns:controls="clr-namespace:MAUIMessenger.Controls"
+             >
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <controls:ReadConverter x:Key="ReadConverter" />
+            <controls:NullToBooleanConverter x:Key="NullToBooleanConverter" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
+    <ScrollView>
+        <VerticalStackLayout Padding="10" Spacing="5">
+            <FlexLayout Wrap="Wrap" JustifyContent="SpaceBetween" AlignItems="Center" >
+                <Label Text="{Binding LoggedInUser.FullName, StringFormat='Welcome back {0}!'}" Margin="2" Style="{StaticResource LargeText}"/>
+                <Button Grid.Column="1" Text="Log Out" Margin="3" Padding="17,10" Command="{Binding LogOutCommand}" />
+            </FlexLayout>
+
+            <FlexLayout JustifyContent="SpaceBetween" AlignItems="Center" Padding="5,5,-6,5" Margin="0,4">
+                <Label Text="Disable Visibililty" />
+                <Switch HorizontalOptions="End" VerticalOptions="End" IsToggled="{Binding IsHidden}"/>
+            </FlexLayout>
+            <BoxView Color="LightGray" HorizontalOptions="Fill" HeightRequest="1" />
+
+            <HorizontalStackLayout IsVisible="{Binding FavoritesVisible}">
+                <Label Text="Favorite Users" Margin="4" Style="{StaticResource MediumText}" />
+                <Label Text="★" Margin="4" TextColor="Yellow" VerticalOptions="Center" FontSize="24" Padding="0"/>
+            </HorizontalStackLayout>
+
+            <CollectionView ItemsSource="{Binding FavoritedUsersWithLastMessage}" SelectionMode="None" IsVisible="{Binding FavoritesVisible}">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="dtos:UserWithMessage">
+                        <Border Stroke="LightGray"
+                        StrokeThickness="1"
+                        StrokeShape="RoundRectangle 8"
+                        Padding="5" 
+                        >
+                            <FlyoutBase.ContextFlyout>
+                                <MenuFlyout >
+                                    <MenuFlyoutItem Text="Remove from Favorites" Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:UsersViewModel}}, Path=UnfavoriteUserCommand}" CommandParameter="{Binding User}" />
+                                    <MenuFlyoutItem Text="{Binding Message.IsSeen, Converter={StaticResource ReadConverter}}" Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:UsersViewModel}}, Path=ToggleReadCommand}" CommandParameter="{Binding Message}" IsEnabled="{Binding Message, Converter={StaticResource NullToBooleanConverter}}"/>
+                                </MenuFlyout>
+                            </FlyoutBase.ContextFlyout>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+
+                                <VerticalStackLayout Margin="10,0,0,0" VerticalOptions="Center" HorizontalOptions="Center" MaximumWidthRequest="400">
+                                    <Label Text="{Binding User.FullName}" />
+                                    <Label Text="{Binding Message.Content, TargetNullValue='No messages yet',FallbackValue='No messages yet'}" LineBreakMode="TailTruncation" Style="{StaticResource SeenMessageLabel}" >
+                                        <Label.Triggers>
+                                            <DataTrigger TargetType="Label"
+                                             Binding="{Binding Message.IsSeen}"
+                                             Value="False">
+                                                <Setter Property="Style" Value="{StaticResource NotSeenMessageLabel}" />
+                                            </DataTrigger>
+                                            <DataTrigger TargetType="Label" 
+                                             Binding="{Binding Message.Content.Length}" 
+                                             Value="0">
+                                                <Setter Property="Text" Value="No messages yet" />
+                                                <Setter Property="FontAttributes" Value="Italic" />
+                                                <Setter Property="Style" Value="{StaticResource SeenMessageLabel}" />
+                                            </DataTrigger>
+                                        </Label.Triggers>
+                                    </Label>
+                                </VerticalStackLayout>
+                                <Button
+                                Grid.Column="1"
+                                Text="Message"
+                                Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:UsersViewModel}}, Path=MessageUserCommand}"
+                                CommandParameter="{Binding User}"
+                                HorizontalOptions="End"
+                                VerticalOptions="Center"
+                                Margin="4,0"/>
+                                <Button
+                                Grid.Column="2"
+                                Text="Block"
+                                Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:UsersViewModel}}, Path=BlockUserCommand}"
+                                CommandParameter="{Binding User}"
+                                Style="{StaticResource NegativeTertiaryButton}"
+                                HorizontalOptions="End"
+                                VerticalOptions="Center"
+                                Padding="25,10"/>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+                <CollectionView.ItemsLayout>
+                    <LinearItemsLayout Orientation="Vertical" ItemSpacing="5" />
+                </CollectionView.ItemsLayout>
+            </CollectionView>
+
+            <Label Text="Users" Margin="4" Style="{StaticResource MediumText}"/>
+            <Label Text="No Users to display" Margin="4" Style="{StaticResource SecondaryLabel}" IsVisible="{Binding NoUsersLabelVisible}"/>
+
+            <CollectionView ItemsSource="{Binding UsersWithLastMessage}" SelectionMode="None">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="dtos:UserWithMessage">
+                        <Border Stroke="LightGray"
+                                StrokeThickness="1"
+                                StrokeShape="RoundRectangle 8"
+                                Padding="5" 
+                                >
+                            <FlyoutBase.ContextFlyout>
+                                <MenuFlyout>
+                                    <MenuFlyoutItem Text="Add to Favorites" Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:UsersViewModel}}, Path=FavoriteUserCommand}" CommandParameter="{Binding User}"/>
+                                    <MenuFlyoutItem Text="{Binding Message.IsSeen, Converter={StaticResource ReadConverter}}" Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:UsersViewModel}}, Path=ToggleReadCommand}" CommandParameter="{Binding Message}" IsEnabled="{Binding Message, Converter={StaticResource NullToBooleanConverter}}"/>
+                                </MenuFlyout>
+                            </FlyoutBase.ContextFlyout>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+
+
+                                <VerticalStackLayout Margin="10,0,0,0" VerticalOptions="Center" HorizontalOptions="Center" MaximumWidthRequest="400">
+                                    <Label Text="{Binding User.FullName}" />
+                                    <Label Text="{Binding Message.Content, TargetNullValue='No messages yet',FallbackValue='No messages yet'}" LineBreakMode="TailTruncation" Style="{StaticResource SeenMessageLabel}" >
+                                        <Label.Triggers>
+                                            <DataTrigger TargetType="Label"
+                                            Binding="{Binding Message.IsSeen}"
+                                            Value="False">
+                                                <Setter Property="Style" Value="{StaticResource NotSeenMessageLabel}" />
+                                            </DataTrigger>
+                                            <DataTrigger TargetType="Label" 
+                                            Binding="{Binding Message.Content.Length}" 
+                                            Value="0">
+                                                <Setter Property="Text" Value="No messages yet" />
+                                                <Setter Property="FontAttributes" Value="Italic" />
+                                                <Setter Property="Style" Value="{StaticResource SeenMessageLabel}" />
+                                            </DataTrigger>
+                                        </Label.Triggers>
+                                    </Label>
+                                </VerticalStackLayout>
+                                <Button
+                                    Grid.Column="1"
+                                    Text="Message"
+                                    Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:UsersViewModel}}, Path=MessageUserCommand}"
+                                    CommandParameter="{Binding User}"
+                                    HorizontalOptions="End"
+                                    VerticalOptions="Center"
+                                    Margin="4,0"/>
+                                <Button
+                                    Grid.Column="2"
+                                    Text="Block"
+                                    Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:UsersViewModel}}, Path=BlockUserCommand}"
+                                    CommandParameter="{Binding User}"
+                                    Style="{StaticResource NegativeTertiaryButton}"
+                                    HorizontalOptions="End"
+                                    VerticalOptions="Center"
+                                    Padding="25,10"/>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+                <CollectionView.ItemsLayout>
+                    <LinearItemsLayout Orientation="Vertical" ItemSpacing="5" />
+                </CollectionView.ItemsLayout>
+            </CollectionView>
+
+            <Label Text="Blocked Users" Margin="4" Style="{StaticResource MediumText}" IsVisible="{Binding BlockedVisible}" />
+
+            <CollectionView ItemsSource="{Binding BlockedUsers}" SelectionMode="None" IsVisible="{Binding BlockedVisible}" >
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="models:User">
+                        <Border Stroke="LightGray"
+                        StrokeThickness="1"
+                        StrokeShape="RoundRectangle 8"
+                        Padding="5" 
+                        >
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+
+                                <Label Text="{Binding FullName}" VerticalOptions="Center" Margin="10,0,0,0" />
+
+                                <Button
+                                Grid.Column="2"
+                                Text="Unblock"
+                                Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:UsersViewModel}}, Path=UnblockUserCommand}"
+                                CommandParameter="{Binding .}"
+                                Style="{StaticResource NegativeTertiaryButton}"
+                                HorizontalOptions="End"
+                                VerticalOptions="Center"
+                                Padding="16,10"/>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+                <CollectionView.ItemsLayout>
+                    <LinearItemsLayout Orientation="Vertical" ItemSpacing="5" />
+                </CollectionView.ItemsLayout>
+            </CollectionView>
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

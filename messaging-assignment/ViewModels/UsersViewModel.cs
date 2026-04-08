@@ -31,7 +31,6 @@ namespace messaging_assignment.ViewModels
                 throw new InvalidOperationException("User must be logged in to view Users.");
             }
             LoggedInUser = _authService.LoggedInUser;
-            ResortUserCategories();
         }
 
         [ObservableProperty]
